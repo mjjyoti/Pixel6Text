@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-
 import 'employee.dart';
+
 
 class EmployeeScreen extends StatefulWidget {
   EmployeeScreen({Key? key}) : super(key: key);
@@ -45,7 +45,9 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
 
       // Extract unique gender and country values for the dropdowns
       genderList = emp.map((e) => e.gender!).toSet().toList();
-      countryList = emp.map((e) => e.address!.country!).toSet().toList();
+      countryList = emp.map((e) {
+        return e.address!.country!;
+      }).toSet().toList();
 
       return emp;
     } else {
@@ -55,7 +57,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
 
   void updateDataSource() {
     final pagedData =
-        filteredEmp.skip(currentPage * pageSize).take(pageSize).toList();
+    filteredEmp.skip(currentPage * pageSize).take(pageSize).toList();
     employeeDataSource = EmployeeDataSource(employeeData: pagedData);
   }
 
@@ -96,17 +98,24 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Image.asset(
-          "assets/Pixel6.png",
-          color: Colors.red,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset(
+            "assets/Pixel6.png",
+            color: Colors.red,
+          ),
         ),
-        actions: [const Icon(Icons.format_align_justify)],
+        actions: const [Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Icon(Icons.format_align_justify),
+        )],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(20.0),
         child: Container(
           width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height / 1.2,
+          height: MediaQuery.of(context).size.height,
+          // height: MediaQuery.of(context).size.height/1.2,
           padding: const EdgeInsets.only(left: 10, right: 10),
           child: FutureBuilder<List<EmployeeModel>>(
             future: employeeListFuture,
@@ -132,16 +141,18 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                         ),
                         Row(
                           children: [
+                            Icon(Icons.filter_alt,color: Colors.red,),
+                            const SizedBox(width: 10),
                             Container(
                               width: 100,
                               height: 50,
                               decoration: BoxDecoration(
                                 border:
-                                    Border.all(color: Colors.black, width: 1),
+                                Border.all(color: Colors.black, width: 1),
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
+                              const EdgeInsets.symmetric(horizontal: 10),
                               child: DropdownButton<String>(
                                 isExpanded: true,
                                 value: selectedCountry,
@@ -149,11 +160,11 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                   'Country',
                                   style: TextStyle(fontSize: 13),
                                 ),
-                                icon: const Icon(Icons.arrow_drop_down),
+                                icon: const Icon(Icons.arrow_drop_down,color: Colors.red,),
                                 iconSize: 24,
                                 elevation: 16,
                                 underline:
-                                    const SizedBox(), // Removes default underline
+                                const SizedBox(), // Removes default underline
                                 onChanged: (String? newValue) {
                                   setState(() {
                                     selectedCountry = newValue;
@@ -161,8 +172,8 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                   });
                                 },
                                 items:
-                                    countryList.map<DropdownMenuItem<String>>(
-                                  (String value) {
+                                countryList.map<DropdownMenuItem<String>>(
+                                      (String value) {
                                     return DropdownMenuItem<String>(
                                       value: value,
                                       child: Text(value),
@@ -177,11 +188,11 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                               height: 50,
                               decoration: BoxDecoration(
                                 border:
-                                    Border.all(color: Colors.black, width: 1),
+                                Border.all(color: Colors.black, width: 1),
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
+                              const EdgeInsets.symmetric(horizontal: 10),
                               child: DropdownButton<String>(
                                 isExpanded: true,
                                 value: selectedGender,
@@ -189,11 +200,11 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                   'Gender',
                                   style: TextStyle(fontSize: 13),
                                 ),
-                                icon: const Icon(Icons.arrow_drop_down),
+                                icon: const Icon(Icons.arrow_drop_down,color: Colors.red,),
                                 iconSize: 24,
                                 elevation: 16,
                                 underline:
-                                    const SizedBox(), // Removes default underline
+                                const SizedBox(), // Removes default underline
                                 onChanged: (String? newValue) {
                                   setState(() {
                                     selectedGender = newValue;
@@ -201,7 +212,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                   });
                                 },
                                 items: genderList.map<DropdownMenuItem<String>>(
-                                  (String value) {
+                                      (String value) {
                                     return DropdownMenuItem<String>(
                                       value: value,
                                       child: Text(value),
@@ -214,7 +225,6 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                         ),
                       ],
                     ),
-
                     // DataGrid
                     const SizedBox(height: 10),
                     Container(
@@ -321,22 +331,22 @@ class EmployeeDataSource extends DataGridSource {
   EmployeeDataSource({required List<EmployeeModel> employeeData}) {
     _employeeData = employeeData
         .map<DataGridRow>((e) => DataGridRow(cells: [
-              DataGridCell<int>(columnName: 'id', value: e.id),
-              DataGridCell<String>(columnName: 'image', value: e.image),
-              DataGridCell<String>(
-                  columnName: 'fullName',
-                  value: '${e.firstName} ${e.lastName}'),
-              DataGridCell<String>(
-                  columnName: 'demography',
-                  value: '${e.gender![0].toUpperCase()}/${e.age}'),
-              DataGridCell<String>(
-                  columnName: 'designation',
-                  value: '${e.company!.title.toString()} '),
-              DataGridCell<String>(
-                  columnName: 'location',
-                  value:
-                      '${e.address!.state.toString()}, ${e.address!.country.toString()}'),
-            ]))
+      DataGridCell<int>(columnName: 'id', value: e.id),
+      DataGridCell<String>(columnName: 'image', value: e.image),
+      DataGridCell<String>(
+          columnName: 'fullName',
+          value: '${e.firstName} ${e.lastName}'),
+      DataGridCell<String>(
+          columnName: 'demography',
+          value: '${e.gender![0].toUpperCase()}/${e.age}'),
+      DataGridCell<String>(
+          columnName: 'designation',
+          value: '${e.company!.title.toString()} '),
+      DataGridCell<String>(
+          columnName: 'location',
+          value:
+          '${e.address!.state.toString()}, ${e.address!.country.toString()}'),
+    ]))
         .toList();
   }
 
@@ -353,7 +363,8 @@ class EmployeeDataSource extends DataGridSource {
           return Container(
             padding: const EdgeInsets.all(8.0),
             alignment: Alignment.center,
-            child: Image.network(dataGridCell.value),
+            child: CircleAvatar(child: Image.network(dataGridCell.value)),
+            // child: Image.network(dataGridCell.value),
           );
         } else if (dataGridCell.columnName == 'id') {
           return Container(
